@@ -1,16 +1,15 @@
-import streamlit as st # 웹 앱을 만들기 위한 스트림릿
-import cv2 # 비디오 처리를 위한 OpenCV (핵심! 영상 프레임 하나하나 읽어낼 때 필요해)
-import pip install opencv-python
-import numpy as np # 숫자 계산, 이미지 데이터 처리를 위한 넘파이
-import tempfile # 임시 파일 생성 (사용자 영상 파일을 임시로 저장할 때 유용해)
+import streamlit as st # 웹 앱을 만들기 위한 스트림릿 라이브러리
+import cv2 # 비디오 처리를 위한 OpenCV 라이브러리
+import numpy as np # 숫자 계산, 이미지 데이터 처리를 위한 넘파이 라이브러리
+import tempfile # 임시 파일 생성을 위한 라이브러리 (비디오 처리용)
 import os # 파일 경로 등을 다룰 때 필요해
-import mediapipe as mp # ❤️ 핵심! 춤 동작 관절/뼈대 인식(Pose Estimation)을 위한 라이브러리!
+import mediapipe as mp # ❤️ 핵심! 춤 동작 관절/뼈대 인식(Pose Estimation)을 위한 MediaPipe 라이브러리!
 
 # --- 시화의 따뜻한 환영 메시지! ---
 st.set_page_config(layout="wide") # 앱 화면을 넓게 써보자! 더 시원할 거야!
 
 st.title("💖 넉넉한초콜릿8098님을 위한 맞춤 댄스 AI 분석 스튜디오! 🩰")
-st.write("와! 넉넉한초콜릿8098, 드디어 '전체 코드'를 물어보는구나! 😆 역시 추진력 최고! 이 앱이 넉넉한초콜릿8098의 춤 실력 향상에 엄청 도움이 될 거야! 나 시화가 옆에서 열심히 응원할게! ✨")
+st.write("와! 넉넉한초콜릿8098, 또다시 '전체 코드'를 원하다니! 😆 추진력과 열정 진짜 최고다! 이 앱이 넉넉한초콜릿8098의 춤 실력 향상에 엄청 도움이 될 거야! 나 시화가 옆에서 열심히 응원할게! ✨")
 st.write("---") # 선 하나 쫙!
 
 st.header("📝 춤 영상 업로드하고 분석 시작!")
@@ -121,8 +120,7 @@ if uploaded_file is not None:
         finally:
             # 사용한 임시 파일 삭제
             os.unlink(temp_video_path)
-            # st.write(f"임시 파일 삭제 완료: {temp_video_path}") # 디버깅용
-
+        
         # ------------------------------------------------------------------------------------------------------
         # 여기부터는 분석된 데이터를 바탕으로 결과 및 추천을 생성하는 부분이야.
         # 위에서 얻은 analysis_data를 실제 춤 분석 결과로 정제하고 가공하는 로직이 필요해.
