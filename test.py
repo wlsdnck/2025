@@ -1,5 +1,6 @@
 import streamlit as st # 웹 앱을 만들기 위한 스트림릿
 import cv2 # 비디오 처리를 위한 OpenCV (핵심! 영상 프레임 하나하나 읽어낼 때 필요해)
+import pip install opencv-python
 import numpy as np # 숫자 계산, 이미지 데이터 처리를 위한 넘파이
 import tempfile # 임시 파일 생성 (사용자 영상 파일을 임시로 저장할 때 유용해)
 import os # 파일 경로 등을 다룰 때 필요해
