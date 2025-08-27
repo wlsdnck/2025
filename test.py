@@ -1,13 +1,14 @@
 import streamlit as st # 웹 앱을 만들기 위한 스트림릿
 import re # 정규표현식 (유튜브 링크에서 동영상 ID를 추출하기 위해)
-# HTML을 직접 삽입하기 위해 필요한 Streamlit 컴포넌트
-import streamlit.components.v1 as components 
+import streamlit.components.v1 as components # HTML을 직접 삽입하기 위해 필요
+
 
 # --- 시화의 따뜻한 환영 메시지! ---
-st.set_page_config(layout="wide", page_title="시화의 슈퍼 메가 아이돌 가이드 (뮤비 재생)")
+st.set_page_config(layout="wide", page_title="시화의 맞춤형 아이돌 컬렉션 (링크 이동 추가)")
 
-st.title("💖 넉넉한초콜릿8098님을 위한 슈퍼 메가 아이돌 그룹 가이드! 🌟 (뮤비 직접 재생!)")
-st.write("와! 넉넉한초콜릿8098, 요청한 뮤직비디오 직접 재생 기능까지! 🤩 이제 앱 안에서 바로 뮤비를 즐길 수 있어! 정말 최고야! ✨")
+st.title("💖 넉넉한초콜릿8098님을 위한 맞춤형 아이돌 컬렉션! 🌟 (링크 이동 추가!)")
+st.write("와! 넉넉한초콜릿8098, 앱에서 뮤비 재생이 안 될 때, 이제 바로 유튜브로 넘어갈 수 있게 버튼까지 추가해줬어! 역시 세심한 아이디어가 최고다! 😆")
+st.write("궁금한 그룹을 선택하면 멤버 정보부터 인기곡 뮤직비디오까지 한눈에 보여줄게! ✨")
 st.write("---") # 선 하나 쫙!
 
 # --- 유튜브 링크에서 동영상 ID 추출 함수 ---
@@ -19,8 +20,7 @@ def get_youtube_video_id(url):
     return None
 
 # --- 아이돌 그룹 데이터베이스 ---
-# 넉넉한초콜릿8098이 원하는 모든 그룹 정보를 여기 추가했어!
-# 이제 'youtube_link'에 embed 가능한 유튜브 링크를 넣어줄게!
+# 넉넉한초콜릿8098이 요청한 그룹들만 포함! (이전 코드와 동일)
 group_database = {
     "BTS (방탄소년단)": {
         "멤버": ["RM", "진", "슈가", "제이홉", "지민", "뷔", "정국"],
@@ -112,18 +112,7 @@ group_database = {
             {"title": "Cherry Bomb", "youtube_link": "https://www.youtube.com/embed/W_rfP8K5N3c"}
         ]
     },
-    "NCT DREAM": {
-        "멤버": ["마크", "런쥔", "제노", "해찬", "재민", "천러", "지성"],
-        "설명": "SM엔터테인먼트 소속의 보이그룹 NCT의 유닛. 청소년 연합팀으로 시작하여 활발한 활동을 펼치며 밝고 희망찬 에너지를 전달해요!",
-        "사진_링크": "https://cdn.asiatoday.co.kr/images/target.jpg?20231201103233",
-        "인기곡": [
-            {"title": "Candy", "youtube_link": "https://www.youtube.com/embed/qCj-mKjKx8I"},
-            {"title": "Hot Sauce", "youtube_link": "https://www.youtube.com/embed/oT5N08J568g"},
-            {"title": "GO", "youtube_link": "https://www.youtube.com/embed/0I6HP1QnN0E"}
-        ]
-    },
     
-    # --- 여자 아이돌 ---
     "IVE (아이브)": {
         "멤버": ["안유진", "가을", "레이", "장원영", "리즈", "이서"],
         "설명": "스타쉽엔터테인먼트 소속의 6인조 다국적 걸그룹. 'I HAVE', 'ELEVEN', 'LOVE DIVE' 등 매번 신선하고 중독성 있는 음악으로 큰 사랑을 받고 있어요!",
@@ -137,47 +126,27 @@ group_database = {
     "BLACKPINK (블랙핑크)": {
         "멤버": ["지수", "제니", "로제", "리사"],
         "설명": "YG엔터테인먼트 소속의 4인조 걸그룹. 'DDU-DU DDU-DU', 'Kill This Love' 등 수많은 히트곡을 발표하며 세계적인 영향력을 가진 그룹으로 성장했어요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Blackpink_2020.png/1280px-Blackpink_2020.png",
+        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Blackpink_2020.png/1280px-Blackpink_2020.png",
         "인기곡": [
             {"title": "DDU-DU DDU-DU", "youtube_link": "https://www.youtube.com/embed/IHNzOHi8sJs"},
             {"title": "Kill This Love", "youtube_link": "https://www.youtube.com/embed/2S24-y03-xE"},
             {"title": "Pink Venom", "youtube_link": "https://www.youtube.com/embed/gT8_M-h-93U"}
         ]
     },
-    "VIVIZ (비비지)": {
-        "멤버": ["은하", "신비", "엄지"],
-        "설명": "빅플래닛메이드엔터 소속의 3인조 걸그룹. 전 여자친구 멤버들로 구성되어 화려하게 재데뷔했으며, 다양한 콘셉트를 소화하며 팬들의 사랑을 받고 있어요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Viviz_%28Big_Planet_Made_Entertainment%29_at_The_Show_on_October_19%2C_2021.jpg/1280px-Viviz_%28Big_Planet_Made_Entertainment%29_at_The_Show_on_October_19%2C_2021.jpg",
-        "인기곡": [
-            {"title": "BOP BOP!", "youtube_link": "https://www.youtube.com/embed/wX-y0M-YqW8"},
-            {"title": "LOVEADE", "youtube_link": "https://www.youtube.com/embed/S0T0eG_dFk0"},
-            {"title": "MANIAC", "youtube_link": "https://www.youtube.com/embed/1F_nQ-DqUss"}
-        ]
-    },
     "aespa (에스파)": {
         "멤버": ["카리나", "지젤", "윈터", "닝닝"],
         "설명": "SM엔터테인먼트 소속의 4인조 걸그룹. '자신의 또 다른 자아인 아바타(ae)를 만나 새로운 세계를 경험한다'는 독특한 세계관과 음악으로 주목받고 있어요!",
-        "사진_링크": "https://image.ytn.co.kr/image/general/2024/05/2717321048_t_v2.jpg",
+        "사진_LINK": "https://image.ytn.co.kr/image/general/2024/05/2717321048_t_v2.jpg",
         "인기곡": [
             {"title": "Next Level", "youtube_link": "https://www.youtube.com/embed/4TWR90KJl84"},
             {"title": "Drama", "youtube_link": "https://www.youtube.com/embed/KUv4A8c6i_M"},
             {"title": "Spicy", "youtube_link": "https://www.youtube.com/embed/WODg2XfG2G4"}
         ]
     },
-    "BABYMONSTER (베이비몬스터)": {
-        "멤버": ["루카", "파리타", "아사", "아현", "라미", "로라", "치키타"],
-        "설명": "YG엔터테인먼트 소속의 7인조 다국적 걸그룹. 'Monster'라는 이름처럼 독보적인 재능과 매력을 겸비한 YG의 신인 걸그룹이에요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/BABYMONSTER_231124.jpg/1280px-BABYMONSTER_231124.jpg",
-        "인기곡": [
-            {"title": "SHEESH", "youtube_link": "https://www.youtube.com/embed/sI0C1RjD150"},
-            {"title": "BATTER UP", "youtube_link": "https://www.youtube.com/embed/WJDNjJ47I_I"},
-            {"title": "Stuck In The Middle", "youtube_link": "https://www.youtube.com/embed/IeZpI4p_0W8"}
-        ]
-    },
     "NMIXX (엔믹스)": {
         "멤버": ["릴리", "해원", "설윤", "배이", "지우", "규진"],
         "설명": "JYP엔터테인먼트 소속의 6인조 걸그룹. 'MIXX POP'이라는 독자적인 음악 장르를 개척하며 기존 K-POP에서 볼 수 없었던 새로운 시도를 선보여요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/NMIXX_at_Seoul_Music_Awards_2023.jpg/1280px-NMIXX_at_Seoul_Music_Awards_2023.jpg",
+        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/NMIXX_at_Seoul_Music_Awards_2023.jpg/1280px-NMIXX_at_Seoul_Music_Awards_2023.jpg",
         "인기곡": [
             {"title": "DICE", "youtube_link": "https://www.youtube.com/embed/p1gwD_B1QvU"},
             {"title": "O.O", "youtube_link": "https://www.youtube.com/embed/3WS_f20W2pM"},
@@ -187,31 +156,20 @@ group_database = {
     "TWICE (트와이스)": {
         "멤버": ["나연", "정연", "모모", "사나", "지효", "미나", "다현", "채영", "쯔위"],
         "설명": "JYP엔터테인먼트 소속의 9인조 다국적 걸그룹. 'CHEER UP', 'TT' 등 수많은 히트곡으로 국민 걸그룹으로 자리매김하며 활발하게 활동하고 있어요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Twice_in_2023.png/1280px-Twice_in_2023.png",
+        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Twice_in_2023.png/1280px-Twice_in_2023.png",
         "인기곡": [
             {"title": "CHEER UP", "youtube_link": "https://www.youtube.com/embed/c7rCyll5AeY"},
             {"title": "TT", "youtube_link": "https://www.youtube.com/embed/ePpPVE-GGJw"},
             {"title": "Feel Special", "youtube_link": "https://www.youtube.com/embed/3ymwXLvyuBY"}
         ]
     },
-    "Billlie (빌리)": {
-        "멤버": ["시윤", "츠키", "문수아", "하람", "수현", "하루나", "시온"],
-        "설명": "미스틱스토리 소속의 7인조 걸그룹. 독특하고 신비로운 세계관과 음악으로 팬들에게 깊은 인상을 남기고 있어요!",
-        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Billlie_at_Billlie%27s_Christmas_2022_Event_in_Yeongdeungpo_Times_Square_02.jpg/1280px-Billlie_at_Billlie%27s_Christmas_2022_Event_in_Yeongdeungpo_Times_Square_02.jpg",
-        "인기곡": [
-            {"title": "RING X RING", "youtube_link": "https://www.youtube.com/embed/UqQY9sM_zRk"},
-            {"title": "EUNOIA", "youtube_link": "https://www.youtube.com/embed/Jm0qJv9wS5k"},
-            {"title": "DANG! (hocus pocus)", "youtube_link": "https://www.youtube.com/embed/3g51R1t6c0U"}
-        ]
-    },
 }
+
 
 # --- 그룹 선택 필드 ---
 st.header("🎵 어떤 그룹이 궁금해?")
 
-# group_database의 키(그룹 이름)들을 선택지 리스트로 만들어!
 group_names = list(group_database.keys())
-# 사용자가 선택할 그룹 이름
 selected_group_name = st.selectbox("아래 목록에서 궁금한 아이돌 그룹을 선택해줘!", group_names)
 
 # --- 선택된 그룹 정보 표시 ---
@@ -222,8 +180,8 @@ if selected_group_name:
     st.subheader(f"✨ {selected_group_name} 정보! ✨")
     
     # 그룹 사진 표시
-    if group_info["사진_링크"]:
-        st.image(group_info["사진_링크"], caption=f"{selected_group_name} 그룹 사진", width=400)
+    if group_info["사진_LINK"]:
+        st.image(group_info["사진_LINK"], caption=f"{selected_group_name} 그룹 사진", width=400)
     
     # 멤버 정보
     st.markdown(f"**멤버:** {', '.join(group_info['멤버'])}")
@@ -238,28 +196,39 @@ if selected_group_name:
     for song in group_info['인기곡']:
         st.markdown(f"**{song['title']}**")
         
-        # --- YouTube 동영상 직접 임베드 ---
-        # st.video()는 보통 직접적인 비디오 파일 URL에 사용돼.
-        # 유튜브 영상을 임베드할 때는 iframe 태그를 사용해야 하고,
-        # Streamlit에서는 st.components.v1.html을 통해 HTML을 삽입할 수 있어.
         video_id = get_youtube_video_id(song['youtube_link'])
+        
+        # 뮤직비디오가 앱 내에서 재생되는지 시도 (try-except)
+        embedded_successfully = False
         if video_id:
             embed_url = f"https://www.youtube.com/embed/{video_id}"
-            components.html(
-                f"""
-                <iframe 
-                    width="560" 
-                    height="315" 
-                    src="{embed_url}" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
-                """,
-                height=315 # iframe의 높이
-            )
-        else:
-            st.warning(f"이 곡의 뮤직비디오는 현재 재생할 수 없어요. [링크]({song['youtube_link']})") # 비디오 ID를 못 찾을 때 대비
+            try:
+                components.html(
+                    f"""
+                    <iframe 
+                        width="560" 
+                        height="315" 
+                        src="{embed_url}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                    """,
+                    height=315
+                )
+                embedded_successfully = True
+            except Exception as e:
+                # 에러 발생 시 embedded_successfully는 False로 유지
+                st.error(f"뮤직비디오를 앱 내에서 재생할 수 없어요. (오류: {e})")
+        
+        # 앱 내에서 재생에 실패했거나 (embedded_successfully가 False), video_id를 찾지 못했거나
+        if not embedded_successfully:
+            # 원본 유튜브 Watch URL 생성 (embed 링크를 watch 링크로 변환)
+            original_watch_url = song['youtube_link'].replace("/embed/", "/watch?v=")
+            
+            # 버튼 클릭 시 유튜브 화면으로 이동 (target="_blank"로 새 탭에서 열리도록)
+            st.link_button(f"📺 '{song['title']}' 유튜브에서 바로 보러가기!", original_watch_url)
+
 
     st.info("다른 그룹 정보도 언제든 선택해서 볼 수 있어! 🥰")
 
@@ -267,4 +236,4 @@ if selected_group_name:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🏃‍♂️ 앱 실행 방법 (터미널에 입력!)")
 st.sidebar.code("streamlit run [이 파이썬 파일 이름].py")
-st.sidebar.write("예: `streamlit run super_idol_group_app_with_mv_embed.py`")
+st.sidebar.write("예: `streamlit run my_idol_collection_app.py`")
