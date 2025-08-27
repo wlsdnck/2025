@@ -1,419 +1,178 @@
-import streamlit as st # 웹 앱을 만들기 위한 스트림릿
-import re # 정규표현식 (유튜브 링크에서 동영상 ID를 추출하기 위해)
-import streamlit.components.v1 as components # HTML을 직접 삽입하기 위해 필요
+import streamlit as st
 
+# 🎉 웹앱 타이틀 설정
+st.title("💖 ✨ 한국 지역 정보 심층 탐험 앱 ✨ 💖")
+st.write("궁금한 지역과 알고 싶은 정보의 종류를 선택해서 더 깊이 있는 내용을 탐험해 보세요!")
 
-# --- 시화의 따뜻한 환영 메시지! ---
-st.set_page_config(layout="wide", page_title="시화의 슈퍼 익스트림 디테일 아이돌 가이드")
-
-st.title("💖 넉넉한초콜릿8098님을 위한 슈퍼 익스트림 디테일 아이돌 가이드! 🌟")
-st.write("와! 넉넉한초콜릿8098, 그룹 정보는 많을수록 좋지! 주요 수상부터 콘셉트까지! 모든 덕질 정보를 한눈에 볼 수 있도록 더 자세한 정보들을 추가해뒀어! 😆")
-st.write("궁금한 그룹을 선택하면 데뷔일, 소속사, 팬덤명부터 멤버 정보, 인기곡 뮤직비디오까지 한눈에 보여줄게! ✨")
-st.write("---") # 선 하나 쫙!
-
-# --- 유튜브 링크에서 동영상 ID 추출 함수 ---
-def get_youtube_video_id(url):
-    # 일반적인 유튜브 watch?v= 또는 embed/ 링크에서 동영상 ID를 추출
-    match = re.search(r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})', url)
-    if match:
-        return match.group(1)
-    return None
-
-# --- 아이돌 그룹 데이터베이스 ---
-# 넉넉한초콜릿8098이 요청한 그룹들만 포함 + 더욱 상세한 정보 추가!
-# 모든 '사진_LINK' 키는 통일되어 있습니다.
-group_database = {
-    "BTS (방탄소년단)": {
-        "멤버": ["RM", "진", "슈가", "제이홉", "지민", "뷔", "정국"],
-        "설명": "빅히트 뮤직 소속의 7인조 보이그룹. 'Dynamite', 'Butter' 등으로 전 세계적인 신드롬을 일으키며 K-POP 역사를 새로 쓰고 있는 그룹이에요!",
-        "사진_LINK": "https://image.ytn.co.kr/image/general/2022/06/202206141344405367_t_v2.jpg",
-        "데뷔일": "2013년 6월 13일",
-        "활동_기간": "2013년 - 현재", # NEW!
-        "소속사": "빅히트 뮤직",
-        "팬덤명": "아미 (ARMY)",
-        "응원봉_이름": "아미밤 (ARMY BOMB)",
-        "공식색": ["보라색 (Purple)"],
-        "주요_수상": ["빌보드 뮤직 어워드 톱 소셜 아티스트", "아메리칸 뮤직 어워드 대상", "그래미 어워드 노미네이션"], # NEW!
-        "콘셉트_키워드": ["성장", "자유", "청춘", "메시지 전달"], # NEW!
-        "대표곡_추가": ["FAKE LOVE", "IDOL", "DNA"], # NEW!
-        "최근_활동": "멤버별 솔로 활동 활발, 각자 개성 강한 음악 선보이며 전 세계 차트 석권 중.", # NEW!
-        "인기곡": [ # MV 링크용 (이전과 동일)
-            {"title": "Dynamite", "youtube_link": "https://www.youtube.com/embed/gdZLi9oWNZg"},
-            {"title": "Butter", "youtube_link": "https://www.youtube.com/embed/WMweEpGlu_U"},
-            {"title": "Spring Day", "youtube_link": "https://www.youtube.com/embed/nM0xHBp_j_Q"}
-        ]
+# 🗺️ 지역별 데이터를 훨씬 다양하게 딕셔너리로 저장하기 (상세 설명 추가!)
+# 이제 각 항목이 이름과 설명을 담는 딕셔너리로 바뀌었어!
+regions_data = {
+    "서울": {
+        "관광명소": [
+            {"이름": "남산타워", "설명": "서울의 상징적인 랜드마크로, 멋진 야경과 함께 사랑의 자물쇠가 유명해요! N서울타워라고도 불려요."},
+            {"이름": "경복궁", "설명": "조선 시대 왕궁으로, 한복을 입고 거닐면 타임머신을 탄 듯한 기분을 느낄 수 있어요! 수문장 교대식도 놓치지 마세요."},
+            {"이름": "명동", "설명": "다양한 길거리 음식과 쇼핑, K-뷰티 체험이 가능한 활기찬 거리예요. 외국인 관광객에게 특히 인기가 많아요."},
+            {"이름": "롯데월드타워", "설명": "우리나라에서 가장 높은 건물 중 하나로, 서울 스카이 전망대에서 환상적인 도시 뷰를 감상할 수 있어요."},
+            {"이름": "COEX (코엑스)", "설명": "스타필드 도서관, 아쿠아리움, 쇼핑몰 등 다양한 시설을 갖춘 복합 문화 공간이에요. SM타운 아티움도 여기 있어요."},
+        ],
+        "유명한 음식": [
+            {"이름": "떡볶이", "설명": "남녀노소 누구나 좋아하는 한국인의 소울푸드! 매콤달콤한 맛에 중독될 거예요."},
+            {"이름": "갈비찜", "설명": "부드러운 고기와 달짝지근한 양념이 어우러진 잔치 음식! 밥도둑으로 최고예요."},
+            {"이름": "치맥 (치킨+맥주)", "설명": "퇴근 후 스트레스를 날려버리는 환상의 조합! 한강에서 먹으면 더 맛있어요."},
+            {"이름": "김치찌개", "설명": "한국인의 밥상에 빠질 수 없는 얼큰한 찌개! 돼지고기, 참치 등 다양한 버전이 있어요."},
+            {"이름": "삼겹살", "설명": "국민 외식 메뉴! 지글지글 불판 위에서 구워 먹는 맛이 일품이에요."},
+        ],
+        "지역 출신 연예인": [
+            {"이름": "방탄소년단 (RM, 진, 슈가, 제이홉, 지민, 뷔, 정국)", "설명": "세계적인 K-POP 그룹. 서울은 멤버들이 활동하는 주요 무대이자 영감을 얻는 공간이죠!"},
+            {"이름": "아이유", "설명": "음악, 연기 등 다방면에서 활약하는 만능 엔터테이너이자 국민 여동생!"},
+            {"이름": "박보검", "설명": "따뜻한 미소와 뛰어난 연기력을 겸비한 배우. 많은 팬을 보유하고 있어요."},
+            {"이름": "수지", "설명": "국민 첫사랑으로 불리는 배우이자 가수. 청순한 매력이 돋보여요."},
+            {"이름": "이병헌", "설명": "칸에서도 인정받은 대한민국 대표 배우. 영화, 드라마에서 활발히 활동 중이에요."},
+        ],
+        "지역 특색 활동": [
+            {"이름": "한강 유람선", "설명": "서울을 가로지르는 한강에서 즐기는 유람선은 낭만적인 도시 풍경을 선사해요."},
+            {"이름": "N서울타워 야경 감상", "설명": "타워에서 내려다보는 서울의 밤은 그 자체로 예술이에요."},
+            {"이름": "동대문 쇼핑", "설명": "새벽까지 활기 넘치는 쇼핑의 메카! 의류, 액세서리 등 다양한 상품을 만날 수 있어요."},
+            {"이름": "홍대 버스킹 관람", "설명": "젊음의 거리 홍대에서 펼쳐지는 다양한 거리 공연은 서울의 에너지를 느끼게 해요."},
+            {"이름": "경복궁 한복 체험", "설명": "고궁에서 한복을 입고 기념사진을 찍으면 특별한 추억을 만들 수 있어요."},
+        ],
+        "쇼핑 추천": [
+            {"이름": "명동", "설명": "화장품, 의류, 길거리 음식 등 관광객들이 좋아하는 모든 것이 모여 있어요."},
+            {"이름": "홍대", "설명": "힙하고 트렌디한 패션 아이템과 개성 넘치는 소품샵이 가득해요."},
+            {"이름": "가로수길", "설명": "유럽풍 분위기의 거리에서 세련된 편집샵과 예쁜 카페를 만날 수 있어요."},
+            {"이름": "코엑스 몰", "설명": "비가 와도 쇼핑하기 좋은 실내 복합 쇼핑몰. 별마당 도서관이 유명해요."},
+            {"이름": "더현대 서울", "설명": "트렌디한 인테리어와 감각적인 브랜드들로 가득한 MZ세대들의 핫플레이스 백화점이에요."},
+        ],
+        "지역 관련 미디어": [
+            {"이름": "응답하라 1988", "설명": "쌍문동을 배경으로 80년대 후반을 그린 드라마로, 서울의 옛 모습과 정서를 잘 보여줘요."},
+            {"이름": "이태원 클라쓰", "설명": "이태원의 밤을 배경으로 청춘들의 도전을 그린 드라마. 서울의 다양한 문화를 엿볼 수 있어요."},
+            {"이름": "나 혼자 산다 (전현무 등)", "설명": "서울에 사는 다양한 연예인들의 일상을 보여주며 서울의 여러 지역을 간접적으로 체험하게 해줘요."},
+            {"이름": "별에서 온 그대", "설명": "도민준과 천송이의 로맨스를 그린 드라마. 남산, 동대문 등 서울의 여러 명소가 배경으로 등장해요."},
+        ],
     },
-    "SEVENTEEN (세븐틴)": {
-        "멤버": ["에스쿱스", "정한", "조슈아", "준", "호시", "원우", "우지", "디에잇", "민규", "도겸", "승관", "버논", "디노"],
-        "설명": "플레디스 엔터테인먼트 소속의 13인조 보이그룹. '자체 제작돌'로 불리며, 퍼포먼스 팀, 힙합 팀, 보컬 팀으로 나뉘어 다채로운 매력을 선보이고 있어요!",
-        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Seventeen_profile_pic.jpeg",
-        "데뷔일": "2015년 5월 26일",
-        "활동_기간": "2015년 - 현재", # NEW!
-        "소속사": "플레디스 엔터테인먼트",
-        "팬덤명": "캐럿 (CARAT)",
-        "응원봉_이름": "캐럿봉 (CARAT BONG)",
-        "공식색": ["로즈쿼츠 (Rose Quartz)", "세레니티 (Serenity)"],
-        "주요_수상": ["골든디스크 대상", "MAMA 올해의 앨범상"], # NEW!
-        "콘셉트_키워드": ["자체 제작", "청량", "칼군무", "에너지"], # NEW!
-        "대표곡_추가": ["아주 NICE", "MANSAE", "CLAP"], # NEW!
-        "최근_활동": "연속 앨범 밀리언셀러 달성, 월드투어 진행 중.", # NEW!
-        "인기곡": [
-            {"title": "Super", "youtube_link": "https://www.youtube.com/embed/e7k8-j62qXo"},
-            {"title": "God of Music", "youtube_link": "https://www.youtube.com/embed/a3Lh-g9qL2Y"},
-            {"title": "Don't Wanna Cry", "youtube_link": "https://www.youtube.com/embed/zEkg4GBQSMc"}
-        ]
+    "부산": { # 부산도 몇 개만 예시로 넣어봤어! 나머지도 이렇게 추가하면 돼!
+        "관광명소": [
+            {"이름": "해운대", "설명": "우리나라 대표 해변! 여름이면 수많은 인파로 북적이는 아름다운 해변이에요."},
+            {"이름": "광안리", "설명": "광안대교의 멋진 야경을 배경으로 버스킹과 불꽃놀이가 유명해요."},
+            {"이름": "감천문화마을", "설명": "알록달록한 집들이 계단식으로 늘어선 마을. '부산의 산토리니'라고 불려요."},
+            "태종대", # 설명이 없는 항목은 그대로 문자열로 두어도 되고, 모두 딕셔너리로 통일해도 좋아!
+            "부산타워",
+        ],
+        "유명한 음식": [
+            {"이름": "돼지국밥", "설명": "부산 여행 필수 코스! 진하고 뜨끈한 국물에 밥을 말아 먹으면 든든해요."},
+            {"이름": "밀면", "설명": "시원한 육수에 쫄깃한 면발이 일품인 부산의 여름 별미예요."},
+            "씨앗호떡",
+            "어묵",
+            "납작만두",
+        ],
+        "지역 출신 연예인": ["강다니엘", "정국 (BTS)", "이준기", "쌈디 (사이먼 도미닉)", "마마무 솔라"],
+        "지역 특색 활동": ["해운대 해변축제 참가", "감천문화마을 벽화 그리기", "BIFF 광장 탐방", "자갈치 시장 구경"],
+        "쇼핑 추천": ["남포동", "서면 지하상가", "센텀시티", "광복동 패션거리"],
+        "지역 관련 미디어": ["친구", "부산행", "범죄도시", "국제시장"],
     },
-    "RIIZE (라이즈)": {
-        "멤버": ["쇼타로", "은석", "성찬", "원빈", "승한", "소희", "앤톤"],
-        "설명": "SM엔터테인먼트 소속의 7인조 보이그룹. 'Realize & Rise'라는 의미를 담고 있으며, 독자적인 장르 '이모셔널 팝'을 추구하는 그룹이에요!",
-        "사진_LINK": "https://images.fmkorea.com/files/attach/new2/20240113/4688195842/726435308/6567950798/786a3454b51a5c689617300ce4c16a50.jpg",
-        "데뷔일": "2023년 9월 4일",
-        "활동_기간": "2023년 - 현재", # NEW!
-        "소속사": "SM엔터테인먼트",
-        "팬덤명": "BRIIZE (브리즈)",
-        "응원봉_이름": "미정",
-        "공식색": ["미정"],
-        "주요_수상": ["골든디스크 신인상", "멜론 뮤직 어워드 신인상"], # NEW!
-        "콘셉트_키워드": ["이모셔널 팝", "성장", "청춘"], # NEW!
-        "대표곡_추가": ["Memories", "Siren"], # NEW!
-        "최근_활동": "다양한 시상식에서 신인상 석권, 일본 데뷔 준비 중.", # NEW!
-        "인기곡": [
-            {"title": "Get A Guitar", "youtube_link": "https://www.youtube.com/embed/f2pf1_rNvnQ"},
-            {"title": "Love 119", "youtube_link": "https://www.youtube.com/embed/NfS7Q6B9Cqw"},
-            {"title": "Talk Saxy", "youtube_link": "https://www.youtube.com/embed/LdYJ6WqJ9qE"}
-        ]
+    "제주": {
+        "관광명소": ["한라산", "성산일출봉", "섭지코지", "애월 해안도로", "용두암"],
+        "유명한 음식": ["흑돼지", "고기국수", "갈치조림", "해산물", "오메기떡"],
+        "지역 출신 연예인": ["세븐틴 (승관)", "악동뮤지션 (이찬혁, 이수현)", "김창완", "아이브 이서", "박명수"],
+        "지역 특색 활동": ["오름 트레킹", "올레길 걷기", "해녀 체험", "승마 체험", "감귤 따기 체험"],
+        "쇼핑 추천": ["동문시장", "중문 관광단지 내 면세점", "제주 특산물 판매점"],
+        "지역 관련 미디어": ["우리들의 블루스", "나의 아저씨 (제주 촬영지)", "효리네 민박"],
     },
-    "BOYNEXTDOOR (보이넥스트도어)": {
-        "멤버": ["성호", "리우", "재현", "태산", "이한", "운학"],
-        "설명": "KOZ엔터테인먼트 소속의 6인조 보이그룹. 옆집 소년들처럼 친근하고 유쾌한 매력으로 대중에게 다가가고 있어요!",
-        "사진_LINK": "https://i.namu.wiki/i/n5D-G3iN4eW1h3Y2d6N9f6G4d4f2G8P5e0e0N8G4b7d5G4a2v9-U_FfU7G_e4L5s2U-9f6B9A3u0v6jF4z2v3S5z5l5P1q1C1g1j1z1h1x1c1e2h2v4l5R9P5B4K6H4F7O4K5J2e.webp",
-        "데뷔일": "2023년 5월 30일",
-        "활동_기간": "2023년 - 현재",
-        "소속사": "KOZ엔터테인먼트",
-        "팬덤명": "와이즐리 (Wiseley)",
-        "응원봉_이름": "미정",
-        "공식색": ["미정"],
-        "주요_수상": ["MAMA 남자 신인상", "한터 뮤직 어워즈 신인상"], # NEW!
-        "콘셉트_키워드": ["일상", "친근", "힙합", "개구쟁이"], # NEW!
-        "대표곡_추가": ["Serenade", "But Sometimes"], # NEW!
-        "최근_활동": "미니 2집 'HOW?'로 활발한 활동.", # NEW!
-        "인기곡": [
-            {"title": "One and Only", "youtube_link": "https://www.youtube.com/embed/MInE7d7J0bU"},
-            {"title": "Serenade", "youtube_link": "https://www.youtube.com/embed/O15-M803GjQ"},
-            {"title": "But Sometime", "youtube_link": "https://www.youtube.com/embed/N4tLwK4hNgs"}
-        ]
+    "강원": {
+        "관광명소": ["설악산", "경포대", "속초 중앙시장", "정동진", "오대산"],
+        "유명한 음식": ["막국수", "닭갈비", "오징어순대", "초당 순두부", "감자전"],
+        "지역 출신 연예인": ["슈퍼주니어 (희철)", "문근영", "원빈", "김태희", "송강호"],
+        "지역 특색 활동": ["속초 포켓몬고 성지순례 (과거)", "정동진 일출 감상", "스키/보드 (겨울)"],
+        "쇼핑 추천": ["속초 중앙시장", "춘천 명동 닭갈비 골목", "강릉 중앙시장"],
+        "지역 관련 미디어": ["겨울연가", "가을동화", "나의 아저씨", "오징어게임 (강릉 촬영지)"],
     },
-    "NCT WISH (엔시티 위시)": {
-        "멤버": ["시온", "리쿠", "유우시", "재희", "료", "사쿠야"],
-        "설명": "SM엔터테인먼트 소속의 6인조 보이그룹. 'WISH for OUR WISH'라는 캐치프레이즈로, 음악과 퍼포먼스를 통해 모든 사람들의 '소원'과 '꿈'을 응원하고 있어요!",
-        "사진_LINK": "https://news.mtn.co.kr/news_content/image_html_dir/2024/02/2024022810052358897_1.jpg",
-        "데뷔일": "2024년 2월 21일 (한국)",
-        "활동_기간": "2024년 - 현재",
-        "소속사": "SM엔터테인먼트",
-        "팬덤명": "미정",
-        "응원봉_이름": "미정",
-        "공식색": ["미정"],
-        "주요_수상": [], # NEW!
-        "콘셉트_키워드": ["청량", "순수", "희망"], # NEW!
-        "대표곡_추가": ["Stars Align"], # NEW!
-        "최근_활동": "데뷔 싱글 'WISH' 활동, 일본에서 먼저 데뷔.", # NEW!
-        "인기곡": [
-            {"title": "WISH", "youtube_link": "https://www.youtube.com/embed/3-E08n8Nq5c"},
-            {"title": "Hands Up", "youtube_link": "https://www.youtube.com/embed/P_3yW7mQ3vE"},
-            {"title": "Stars Align", "youtube_link": "https://www.youtube.com/embed/84VwJbB34y0"}
-        ]
+    "경주": {
+        "관광명소": ["불국사", "석굴암", "대릉원", "첨성대", "동궁과 월지"],
+        "유명한 음식": ["황남빵", "쌈밥", "교리김밥", "찰보리빵", "콩국"],
+        "지역 출신 연예인": ["이영아", "진선규", "송영길", "박보영"],
+        "지역 특색 활동": ["한복 입고 문화재 탐방", "보문호반길 산책", "황리단길 카페 투어", "신라의 밤 축제"],
+        "쇼핑 추천": ["황리단길", "성동시장", "중앙시장"],
+        "지역 관련 미디어": ["선덕여왕", "찬란한 유산", "달의 연인 - 보보경심 려"],
     },
-    "투모로우바이투게더 (TXT)": {
-        "멤버": ["수빈", "연준", "범규", "태현", "휴닝카이"],
-        "설명": "빅히트 뮤직 소속의 5인조 보이그룹. 밝고 청량한 매력으로 '성장'과 '청춘'의 서사를 노래하며 많은 사랑을 받고 있어요!",
-        "사진_LINK": "https://image.ytn.co.kr/image/general/2024/03/2908581024_t_v2.jpg",
-        "데뷔일": "2019년 3월 4일",
-        "활동_기간": "2019년 - 현재",
-        "소속사": "빅히트 뮤직",
-        "팬덤명": "모아 (MOA)",
-        "응원봉_이름": "투바투봉",
-        "공식색": ["미정"],
-        "주요_수상": ["골든디스크 넥스트 제너레이션", "서울가요대상 본상"], # NEW!
-        "콘셉트_키워드": ["성장통", "상상", "판타지", "청춘"], # NEW!
-        "대표곡_추가": ["Crown", "Can't You See Me?"], # NEW!
-        "최근_활동": "다양한 해외 무대 및 페스티벌 참여, 활발한 앨범 활동.", # NEW!
-        "인기곡": [
-            {"title": "Sugar Rush Ride", "youtube_link": "https://www.youtube.com/embed/MADXyqR0cQ4"},
-            {"title": "Good Boy Gone Bad", "youtube_link": "https://www.youtube.com/embed/y_HwJ718pYw"},
-            {"title": "Run Away", "youtube_link": "https://www.youtube.com/embed/X5MFlG-g3U8"}
-        ]
+    "전주": {
+        "관광명소": ["전주 한옥마을", "경기전", "전동성당", "덕진공원"],
+        "유명한 음식": ["전주 비빔밥", "콩나물국밥", "모주", "피순대", "가맥"],
+        "지역 출신 연예인": ["윤균상", "한예슬", "송새벽", "이하늬", "박준형 (god)"],
+        "지역 특색 활동": ["한옥마을 한복 체험", "전주 국제영화제", "가맥 축제", "소리문화의 전당 공연"],
+        "쇼핑 추천": ["한옥마을 기념품샵", "남부시장 야시장"],
+        "지역 관련 미디어": ["내일도 칸타빌레 (전주 배경)", "나의 해방일지 (전주 시청 촬영)"],
     },
-    "TWS (투어스)": {
-        "멤버": ["신유", "도훈", "영재", "한진", "지훈", "경민"],
-        "설명": "플레디스 엔터테인먼트 소속의 6인조 보이그룹. 보이 넥스트 도어의 동생 그룹이자 세븐틴 동생 그룹으로 2024년 데뷔했어요. 밝고 긍정적인 '보이후드 팝' 장르를 표방해요!",
-        "사진_LINK": "https://img.osen.co.kr/article/2024/03/14/202403140924773809_650x.jpg",
-        "데뷔일": "2024년 1월 22일",
-        "활동_기간": "2024년 - 현재",
-        "소속사": "플레디스 엔터테인먼트",
-        "팬덤명": "42(싸이)",
-        "응원봉_이름": "미정",
-        "공식색": ["미정"],
-        "주요_수상": [], # NEW!
-        "콘셉트_키워드": ["소년", "청량", "친구", "첫 만남"], # NEW!
-        "대표곡_추가": ["plot twist", "BFF"], # NEW!
-        "최근_활동": "데뷔곡 '첫 만남은 계획대로 되지 않아'로 음악 방송 1위 차지.", # NEW!
-        "인기곡": [
-            {"title": "첫 만남은 계획대로 되지 않아", "youtube_link": "https://www.youtube.com/embed/mE9pQvI-iT0"},
-            {"title": "BFF", "youtube_link": "https://www.youtube.com/embed/p79q6cM28gE"},
-            {"title": "unplugged boy", "youtube_link": "https://www.youtube.com/embed/0kI4_7_yP-8"}
-        ]
+    "광주": {
+        "관광명소": ["국립아시아문화전당", "5.18 민주광장", "무등산", "양림동 근대골목"],
+        "유명한 음식": ["떡갈비", "오리탕", "상추튀김", "무등산 보리밥"],
+        "지역 출신 연예인": ["방탄소년단 (제이홉)", "동방신기 (유노윤호)", "미쓰에이 (수지)", "빅뱅 (승리)", "박신혜"],
+        "지역 특색 활동": ["국립아시아문화전당 공연/전시 관람", "5.18 민주묘지 참배", "양림동 역사 문화마을 투어"],
+        "쇼핑 추천": ["충장로", "상무지구"],
+        "지역 관련 미디어": ["택시운전사", "1987", "화려한 휴가"],
     },
-    "EXO (엑소)": {
-        "멤버": ["수호", "시우민", "백현", "첸", "찬열", "디오", "카이", "세훈"],
-        "설명": "SM엔터테인먼트 소속의 보이그룹. '으르렁', 'CALL ME BABY' 등으로 큰 인기를 얻으며 K-POP의 황금기를 이끈 대표적인 그룹이에요!",
-        "사진_LINK": "https://file.osen.co.kr/article/2023/07/11/202307111059775269_650x.jpg",
-        "데뷔일": "2012년 4월 8일",
-        "활동_기간": "2012년 - 현재",
-        "소속사": "SM엔터테인먼트",
-        "팬덤명": "엑소-엘 (EXO-L)",
-        "응원봉_이름": "에리디봉",
-        "공식색": ["코스믹 라떼 (Cosmic Latte)"],
-        "주요_수상": ["MAMA 올해의 앨범상", "골든디스크 대상", "서울가요대상 대상"], # NEW!
-        "콘셉트_키워드": ["초능력", "SF", "웅장", "다크"], # NEW!
-        "대표곡_추가": ["Growl", "Overdose", "Monster"], # NEW!
-        "최근_활동": "솔로 활동 및 유닛 활동 병행, 멤버별 다양한 분야에서 활약.", # NEW!
-        "인기곡": [
-            {"title": "으르렁 (Growl)", "youtube_link": "https://www.youtube.com/embed/I3dezFzsNig"},
-            {"title": "CALL ME BABY", "youtube_link": "https://www.youtube.com/embed/yWfsla_Um80"},
-            {"title": "Love Shot", "youtube_link": "https://www.youtube.com/embed/pX_S4L5wS0g"}
-        ]
+    "대구": {
+        "관광명소": ["이월드", "동성로", "팔공산", "서문시장", "김광석 다시그리기 길"],
+        "유명한 음식": ["막창", "동인동 찜갈비", "납작만두", "뭉티기", "대구 따로국밥"],
+        "지역 출신 연예인": ["방탄소년단 (슈가)", "송혜교", "손예진", "레드벨벳 (조이)", "보아"],
+        "지역 특색 활동": ["이월드 별빛축제 즐기기", "동성로 로데오 거리 탐방", "팔공산 케이블카 탑승", "서문시장 야시장 먹거리 투어"],
+        "쇼핑 추천": ["동성로", "서문시장", "대구 신세계 백화점", "현대백화점 대구점"],
+        "지역 관련 미디어": ["괜찮아 사랑이야", "미스터 션샤인 (일부 촬영)"],
     },
-    "NCT 127": {
-        "멤버": ["태일", "쟈니", "태용", "유타", "도영", "재현", "정우", "마크", "해찬"],
-        "설명": "SM엔터테인먼트 소속의 보이그룹 NCT의 유닛. 서울(127)을 기반으로 활동하며 'Neo Culture Technology'의 정체성을 보여주는 독특한 음악과 퍼포먼스를 선보여요!",
-        "사진_LINK": "https://file.osen.co.kr/article/2022/09/20/202209200827774780_650x.jpg",
-        "데뷔일": "2016년 7월 7일",
-        "활동_기간": "2016년 - 현재",
-        "소속사": "SM엔터테인먼트",
-        "팬덤명": "시즈니 (NCTzen)",
-        "응원봉_이름": "응원봉",
-        "공식색": ["펄 네오 샴페인 (Pearl Neo Champagne)"],
-        "주요_수상": ["서울가요대상 본상", "가온차트 뮤직 어워즈 올해의 가수상"], # NEW!
-        "콘셉트_키워드": ["힙합", "네오", "시크", "파워풀"], # NEW!
-        "대표곡_추가": ["Cherry Bomb", "Regular", "Kick It"], # NEW!
-        "최근_활동": "정규 5집 'Fact Check' 활동 및 콘서트 투어.", # NEW!
-        "인기곡": [
-            {"title": "영웅 (英雄; Kick It)", "youtube_link": "https://www.youtube.com/embed/ZfXnL5S8VnU"},
-            {"title": "2 Baddies", "youtube_link": "https://www.youtube.com/embed/w6J9d-WbFgc"},
-            {"title": "Cherry Bomb", "youtube_link": "https://www.youtube.com/embed/W_rfP8K5N3c"}
-        ]
+    "인천": {
+        "관광명소": ["인천 차이나타운", "월미도", "송도 센트럴파크", "영종도", "소래포구"],
+        "유명한 음식": ["짜장면", "닭강정", "조개구이", "간장게장", "물텀벙이"],
+        "지역 출신 연예인": ["원빈", "김지원", "유승호", "블랙핑크 (지수)", "아이브 (안유진)"],
+        "지역 특색 활동": ["월미도 바이킹/디스코팡팡 체험", "차이나타운 먹거리 탐방", "송도 센트럴파크 수상택시", "소래포구 어시장 구경"],
+        "쇼핑 추천": ["송도 트리플 스트리트", "스퀘어원", "NC 큐브 커낼워크", "신포시장"],
+        "지역 관련 미디어": ["전지적 참견 시점 (인천 공항)", "미스터 션샤인 (인천 근대 건축물)", "도깨비 (인천 촬영지)"],
     },
-    
-    "IVE (아이브)": {
-        "멤버": ["안유진", "가을", "레이", "장원영", "리즈", "이서"],
-        "설명": "스타쉽엔터테인먼트 소속의 6인조 다국적 걸그룹. 'I HAVE', 'ELEVEN', 'LOVE DIVE' 등 매번 신선하고 중독성 있는 음악으로 큰 사랑을 받고 있어요!",
-        "사진_LINK": "https://image.ytn.co.kr/image/general/2024/05/2710313176_t_v2.jpg",
-        "데뷔일": "2021년 12월 1일",
-        "활동_기간": "2021년 - 현재", # NEW!
-        "소속사": "스타쉽 엔터테인먼트",
-        "팬덤명": "다이브 (DIVE)",
-        "응원봉_이름": "아이브봉 (IVE BONG)",
-        "공식색": ["짙은 남색 (Deep Blue)"],
-        "주요_수상": ["골든디스크 대상", "MMA 올해의 베스트송", "MAMA 대상"], # NEW!
-        "콘셉트_키워드": ["자기애", "당당함", "우아함", "MZ세대"], # NEW!
-        "대표곡_추가": ["ELEVEN", "LOVE DIVE", "After LIKE"], # NEW!
-        "최근_활동": "미니 2집 'IVE SWITCH'로 컴백, 다채로운 퍼포먼스 선보임.", # NEW!
-        "인기곡": [
-            {"title": "I AM", "youtube_link": "https://www.youtube.com/embed/6ZUIwj3FgEQ"},
-            {"title": "LOVE DIVE", "youtube_link": "https://www.youtube.com/embed/Y8JFxS1HlDo"},
-            {"title": "ELEVEN", "youtube_link": "https://www.youtube.com/embed/F0B7HDiY-1E"}
-        ]
-    },
-    "BLACKPINK (블랙핑크)": {
-        "멤버": ["지수", "제니", "로제", "리사"],
-        "설명": "YG엔터테인먼트 소속의 4인조 걸그룹. 'DDU-DU DDU-DU', 'Kill This Love' 등 수많은 히트곡을 발표하며 세계적인 영향력을 가진 그룹으로 성장했어요!",
-        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Blackpink_2020.png/1280px-Blackpink_2020.png",
-        "데뷔일": "2016년 8월 8일",
-        "활동_기간": "2016년 - 현재", # NEW!
-        "소속사": "YG엔터테인먼트",
-        "팬덤명": "블링크 (BLINK)",
-        "응원봉_이름": "블링크봉 (BLINK BONG)",
-        "공식색": ["블랙 (Black)", "핑크 (Pink)"],
-        "주요_수상": ["MTV VMAs 올해의 그룹", "아시아 아티스트 어워즈 대상"], # NEW!
-        "콘셉트_키워드": ["걸크러쉬", "힙합", "럭셔리", "트렌드세터"], # NEW!
-        "대표곡_추가": ["DDU-DU DDU-DU", "How You Like That", "Lovesick Girls"], # NEW!
-        "최근_활동": "멤버별 솔로 활동 활발, 글로벌 앰버서더로 패션계 영향력 확대.", # NEW!
-        "인기곡": [
-            {"title": "DDU-DU DDU-DU", "youtube_link": "https://www.youtube.com/embed/IHNzOHi8sJs"},
-            {"title": "Kill This Love", "youtube_link": "https://www.youtube.com/embed/2S24-y03-xE"},
-            {"title": "Pink Venom", "youtube_link": "https://www.youtube.com/embed/gT8_M-h-93U"}
-        ]
-    },
-    "aespa (에스파)": {
-        "멤버": ["카리나", "지젤", "윈터", "닝닝"],
-        "설명": "SM엔터테인먼트 소속의 4인조 걸그룹. '자신의 또 다른 자아인 아바타(ae)를 만나 새로운 세계를 경험한다'는 독특한 세계관과 음악으로 주목받고 있어요!",
-        "사진_LINK": "https://image.ytn.co.kr/image/general/2024/05/2717321048_t_v2.jpg",
-        "데뷔일": "2020년 11월 17일",
-        "활동_기간": "2020년 - 현재", # NEW!
-        "소속사": "SM엔터테인먼트",
-        "팬덤명": "MY (마이)",
-        "응원봉_이름": "마이봉 (MY BONG)",
-        "공식색": ["미정"],
-        "주요_수상": ["골든디스크 디지털 음원 본상", "서울가요대상 본상"], # NEW!
-        "콘셉트_키워드": ["메타버스", "AI", "블랙맘바", "강력함"], # NEW!
-        "대표곡_추가": ["Next Level", "Savage", "Girls"], # NEW!
-        "최근_활동": "정규 1집 'Armageddon' 발매, 강렬한 콘셉트로 활동.", # NEW!
-        "인기곡": [
-            {"title": "Next Level", "youtube_link": "https://www.youtube.com/embed/4TWR90KJl84"},
-            {"title": "Drama", "youtube_link": "https://www.youtube.com/embed/KUv4A8c6i_M"},
-            {"title": "Spicy", "youtube_link": "https://www.youtube.com/embed/WODg2XfG2G4"}
-        ]
-    },
-    "NMIXX (엔믹스)": {
-        "멤버": ["릴리", "해원", "설윤", "배이", "지우", "규진"],
-        "설명": "JYP엔터테인먼트 소속의 6인조 걸그룹. 'MIXX POP'이라는 독자적인 음악 장르를 개척하며 기존 K-POP에서 볼 수 없었던 새로운 시도를 선보여요!",
-        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/NMIXX_at_Seoul_Music_Awards_2023.jpg/1280px-NMIXX_at_Seoul_Music_Awards_2023.jpg",
-        "데뷔일": "2022년 2월 22일",
-        "활동_기간": "2022년 - 현재",
-        "소속사": "JYP엔터테인먼트",
-        "팬덤명": "엔써 (NSWER)",
-        "응원봉_이름": "엔라이트 (Nlight)",
-        "공식색": ["미정"],
-        "주요_수상": ["서울가요대상 신인상", "MAMA 페이보릿 뉴 아티스트"], # NEW!
-        "콘셉트_키워드": ["믹스 팝", "다채로움", "자유", "다인원"], # NEW!
-        "대표곡_추가": ["DICE", "O.O", "Love Me Like This"], # NEW!
-        "최근_활동": "미니 2집 'Fe3O4: BREAK' 발매, 타이틀곡 'DASH'로 활동.", # NEW!
-        "인기곡": [
-            {"title": "DICE", "youtube_link": "https://www.youtube.com/embed/p1gwD_B1QvU"},
-            {"title": "O.O", "youtube_link": "https://www.youtube.com/embed/3WS_f20W2pM"},
-            {"title": "Love Me Like This", "youtube_link": "https://www.youtube.com/embed/p4gC2_l_xK4"}
-        ]
-    },
-    "TWICE (트와이스)": {
-        "멤버": ["나연", "정연", "모모", "사나", "지효", "미나", "다현", "채영", "쯔위"],
-        "설명": "JYP엔터테인먼트 소속의 9인조 다국적 걸그룹. 'CHEER UP', 'TT' 등 수많은 히트곡으로 국민 걸그룹으로 자리매김하며 활발하게 활동하고 있어요!",
-        "사진_LINK": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Twice_in_2023.png/1280px-Twice_in_2023.png",
-        "데뷔일": "2015년 10월 20일",
-        "활동_기간": "2015년 - 현재",
-        "소속사": "JYP엔터테인먼트",
-        "팬덤명": "원스 (ONCE)",
-        "응원봉_이름": "캔디봉 (CANDYBONG)",
-        "공식색": ["애프리콧 (Apricot)", "네온 마젠타 (Neon Magenta)"],
-        "주요_수상": ["골든디스크 대상", "MAMA 올해의 가수상", "멜론 뮤직 어워드 올해의 노래상"], # NEW!
-        "콘셉트_키워드": ["에너지", "큐티", "청량", "글로벌"], # NEW!
-        "대표곡_추가": ["CHEER UP", "TT", "Feel Special", "SIGNAL"], # NEW!
-        "최근_활동": "미니 13집 'With YOU-th' 발매, 월드투어 진행 중.", # NEW!
-        "인기곡": [
-            {"title": "CHEER UP", "youtube_link": "https://www.youtube.com/embed/c7rCyll5AeY"},
-            {"title": "TT", "youtube_link": "https://www.youtube.com/embed/ePpPVE-GGJw"},
-            {"title": "Feel Special", "youtube_link": "https://www.youtube.com/embed/3ymwXLvyuBY"}
-        ]
+    "무안": {
+        "관광명소": ["무안 백련지", "홀통 유원지", "무안 황토갯벌랜드", "회산백련지"],
+        "유명한 음식": ["무안 낙지 (세발낙지, 연포탕)", "양파 한우", "무안 돼지불고기"],
+        "지역 출신 연예인": ["김형곤", "나상도"],
+        "지역 특색 활동": ["백련지 연꽃 축제 (여름)", "갯벌 체험", "무안 YD 페스티벌", "홀통해수욕장 윈드서핑"],
+        "쇼핑 추천": ["남악 신도심 상가", "무안 5일장 (전통시장)"],
+        "지역 관련 미디어": ["극한직업 (낙지편)", "무안 관련 지역 다큐멘터리"],
     },
 }
 
+# 📍 첫 번째 선택 상자: 지역 선택
+selected_region = st.selectbox(
+    "어떤 지역이 궁금하세요? 🤔",
+    list(regions_data.keys()),
+    key="region_selector"
+)
 
-# --- 그룹 선택 필드 ---
-st.header("🎵 어떤 그룹이 궁금해?")
+# 🤩 지역이 선택되었다면, 그 지역에서 볼 수 있는 정보 종류를 두 번째 선택 상자로 보여주기
+if selected_region:
+    st.markdown("---") # 구분선으로 깔끔하게
 
-group_names = list(group_database.keys())
-selected_group_name = st.selectbox("아래 목록에서 궁금한 아이돌 그룹을 선택해줘!", group_names)
+    # 선택된 지역의 정보 종류 (카테고리) 가져오기
+    available_categories = list(regions_data[selected_region].keys())
 
-# --- 선택된 그룹 정보 표시 ---
-if selected_group_name:
-    group_info = group_database[selected_group_name]
-    
-    st.write("---") # 구분선
-    st.subheader(f"✨ {selected_group_name} 정보! ✨")
-    
-    # 그룹 사진 표시
-    if "사진_LINK" in group_info and group_info["사진_LINK"]: # '사진_LINK' 키가 있는지 먼저 확인하고 표시
-        st.image(group_info["사진_LINK"], caption=f"{selected_group_name} 그룹 사진", width=400)
-    
-    # 상세 정보 출력
-    st.markdown(f"**데뷔일:** {group_info.get('데뷔일', '정보 없음')}")
-    st.markdown(f"**활동 기간:** {group_info.get('활동_기간', '정보 없음')}") # NEW!
-    st.markdown(f"**소속사:** {group_info.get('소속사', '정보 없음')}")
-    st.markdown(f"**팬덤명:** {group_info.get('팬덤명', '정보 없음')}")
-    st.markdown(f"**응원봉 이름:** {group_info.get('응원봉_이름', '정보 없음')}")
-    
-    # 공식 색상이 리스트일 경우와 아닐 경우 처리
-    official_color = group_info.get('공식색', ['정보 없음'])
-    if isinstance(official_color, list):
-        st.markdown(f"**공식 색상:** {', '.join(official_color)}")
+    # 📌 두 번째 선택 상자: 정보 종류 선택
+    selected_category = st.selectbox(
+        f"{selected_region}에서 어떤 정보가 궁금하세요? 👀",
+        available_categories,
+        key="category_selector"
+    )
+
+    st.header(f"✨ {selected_region}의 '{selected_category}' 정보 ✨")
+
+    # 선택된 지역과 선택된 카테고리에 맞는 데이터 가져오기
+    info_list = regions_data[selected_region][selected_category]
+
+    # 정보를 목록 형태로 보여주기
+    if info_list:
+        for item in info_list:
+            if isinstance(item, dict): # 딕셔너리 형태 (이름, 설명)면 이렇게 출력!
+                st.markdown(f"- **{item['이름']}**: {item['설명']}")
+            else: # 그냥 문자열 형태면 평소처럼 출력!
+                st.write(f"- {item}")
     else:
-        st.markdown(f"**공식 색상:** {official_color}")
+        st.write(f"아쉽게도 '{selected_category}'에 대한 정보가 아직 없네요. 😅")
 
-    # 주요 수상
-    main_awards = group_info.get('주요_수상', []) # NEW!
-    if main_awards:
-        st.markdown(f"**주요 수상:** {', '.join(main_awards)}")
-    else:
-        st.markdown(f"**주요 수상:** 정보 없음")
-
-    # 콘셉트 키워드
-    concept_keywords = group_info.get('콘셉트_키워드', []) # NEW!
-    if concept_keywords:
-        st.markdown(f"**콘셉트 키워드:** {', '.join(concept_keywords)}")
-    else:
-        st.markdown(f"**콘셉트 키워드:** 정보 없음")
-
-    # 대표곡 (인기곡 MV와는 별도로 명시)
-    top_songs = group_info.get('대표곡_추가', []) # NEW!
-    if top_songs:
-        st.markdown(f"**대표곡:** {', '.join(top_songs)}")
-    else:
-        st.markdown(f"**대표곡:** 정보 없음")
-
-    # 최근 활동
-    recent_activity = group_info.get('최근_활동', '정보 없음') # NEW!
-    st.markdown(f"**최근 활동:** {recent_activity}")
-
-    # 멤버 정보
-    st.markdown(f"**멤버:** {', '.join(group_info['멤버'])}")
-    
-    # 그룹 설명
-    st.markdown(f"**그룹 설명:** {group_info['설명']}")
-    
-    st.write("---")
-    st.subheader("🎶 이 그룹의 인기곡 뮤직비디오를 감상해봐! 🎶")
-    
-    # 인기곡 목록과 유튜브 링크 표시
-    for song in group_info['인기곡']:
-        st.markdown(f"**{song['title']}**")
-        
-        video_id = get_youtube_video_id(song['youtube_link'])
-        
-        # 뮤직비디오가 앱 내에서 재생되는지 시도 (try-except)
-        embedded_successfully = False
-        if video_id:
-            embed_url = f"https://www.youtube.com/embed/{video_id}"
-            try:
-                components.html(
-                    f"""
-                    <iframe 
-                        width="560" 
-                        height="315" 
-                        src="{embed_url}" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                    """,
-                    height=315
-                )
-                embedded_successfully = True
-            except Exception as e:
-                # 에러 발생 시 embedded_successfully는 False로 유지
-                st.error(f"뮤직비디오를 앱 내에서 재생할 수 없어요. (오류: {e})")
-        
-        # 앱 내에서 재생에 실패했거나 (embedded_successfully가 False), video_id를 찾지 못했거나
-        if not embedded_successfully:
-            # 원본 유튜브 Watch URL 생성 (embed 링크를 watch 링크로 변환)
-            original_watch_url = song['youtube_link'].replace("/embed/", "/watch?v=")
-            
-            # 버튼 클릭 시 유튜브 화면으로 이동 (target="_blank"로 새 탭에서 열리도록)
-            st.link_button(f"📺 '{song['title']}' 유튜브에서 바로 보러가기!", original_watch_url)
-
-
-    st.info("다른 그룹 정보도 언제든 선택해서 볼 수 있어! 🥰")
-
-# --- 앱 실행 방법 ---
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🏃‍♂️ 앱 실행 방법 (터미널에 입력!)")
-st.sidebar.code("streamlit run [이 파이썬 파일 이름].py")
-st.sidebar.write("예: `streamlit run my_extreme_detail_idol_app.py`")
+# 팁: 이미지나 지도도 추가하면 훨씬 풍성해질 거야! 😉
+st.markdown("---") # 구분선
+st.info("이 코드를 실행하려면 `streamlit run 당신의파일이름.py` 명령어를 사용해주세요!")
+st.write("이제 더 상세한 정보를 얻을 수 있게 됐지? 넉넉한초콜릿8098 최고다! 진짜 최고! 👍")
