@@ -1,260 +1,240 @@
 import streamlit as st # 웹 앱을 만들기 위한 스트림릿
-from PIL import Image # 이미지 파일을 다루기 위한 Pillow 라이브러리
-import io # 이미지 데이터를 바이너리로 다룰 때 필요해
-import random # 노래 랜덤 추천을 위해
-import time # 검색 시뮬레이션용
 
 # --- 시화의 따뜻한 환영 메시지! ---
-st.set_page_config(layout="wide", page_title="시화의 궁극의 아이돌 분석기 (뮤비 연동)")
+st.set_page_config(layout="wide", page_title="시화의 슈퍼 메가 아이돌 가이드")
 
-st.title("💖 넉넉한초콜릿8098님을 위한 시화의 궁극의 아이돌 분석 스튜디오! 🌟 (뮤비 연동 버전!)")
-st.write("와! 넉넉한초콜릿8098, 역시 디테일까지 완벽하게! 🤩 노래 추천 옆에 뮤직비디오까지 바로 볼 수 있게 해줬어! 이제 아이돌 덕질이 더 편해질 거야! ✨")
+st.title("💖 넉넉한초콜릿8098님을 위한 슈퍼 메가 아이돌 그룹 가이드! 🌟")
+st.write("와! 넉넉한초콜릿8098, 요청한 모든 그룹들을 다 추가해줬어! 이제 원하는 그룹만 쏙쏙 골라서 정보랑 뮤직비디오를 한눈에 볼 수 있어! 😆")
+st.write("궁금한 그룹을 선택하면 멤버 정보부터 인기곡 뮤직비디오까지 한눈에 보여줄게! ✨")
 st.write("---") # 선 하나 쫙!
 
-# --- 아이돌 데이터베이스 (미리 알고 있는 아이돌 정보. 이 데이터가 앱의 핵심!) ---
-# '추천_노래' 항목에 노래 제목과 함께 'youtube_link'를 추가했어!
-idol_database = {
+# --- 아이돌 그룹 데이터베이스 ---
+# 넉넉한초콜릿8098이 원하는 모든 그룹 정보를 여기 추가했어!
+group_database = {
+    "BTS (방탄소년단)": {
+        "멤버": ["RM", "진", "슈가", "제이홉", "지민", "뷔", "정국"],
+        "설명": "빅히트 뮤직 소속의 7인조 보이그룹. 'Dynamite', 'Butter' 등으로 전 세계적인 신드롬을 일으키며 K-POP 역사를 새로 쓰고 있는 그룹이에요!",
+        "사진_링크": "https://image.ytn.co.kr/image/general/2022/06/202206141344405367_t_v2.jpg",
+        "인기곡": [
+            {"title": "Dynamite", "youtube_link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
+            {"title": "Butter", "youtube_link": "https://www.youtube.com/watch?v=WMweEpGlu_U"},
+            {"title": "Spring Day", "youtube_link": "https://www.youtube.com/watch?v=nM0xHBp_j_Q"}
+        ]
+    },
+    "SEVENTEEN (세븐틴)": {
+        "멤버": ["에스쿱스", "정한", "조슈아", "준", "호시", "원우", "우지", "디에잇", "민규", "도겸", "승관", "버논", "디노"],
+        "설명": "플레디스 엔터테인먼트 소속의 13인조 보이그룹. '자체 제작돌'로 불리며, 퍼포먼스 팀, 힙합 팀, 보컬 팀으로 나뉘어 다채로운 매력을 선보이고 있어요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Seventeen_profile_pic.jpeg",
+        "인기곡": [
+            {"title": "Super", "youtube_link": "https://www.youtube.com/watch?v=e7k8-j62qXo"},
+            {"title": "God of Music", "youtube_link": "https://www.youtube.com/watch?v=a3Lh-g9qL2Y"},
+            {"title": "Don't Wanna Cry", "youtube_link": "https://www.youtube.com/watch?v=zEkg4GBQSMc"}
+        ]
+    },
+    "RIIZE (라이즈)": {
+        "멤버": ["쇼타로", "은석", "성찬", "원빈", "승한", "소희", "앤톤"],
+        "설명": "SM엔터테인먼트 소속의 7인조 보이그룹. 'Realize & Rise'라는 의미를 담고 있으며, 독자적인 장르 '이모셔널 팝'을 추구하는 그룹이에요!",
+        "사진_링크": "https://images.fmkorea.com/files/attach/new2/20240113/4688195842/726435308/6567950798/786a3454b51a5c689617300ce4c16a50.jpg",
+        "인기곡": [
+            {"title": "Get A Guitar", "youtube_link": "https://www.youtube.com/watch?v=f2pf1_rNvnQ"},
+            {"title": "Love 119", "youtube_link": "https://www.youtube.com/watch?v=NfS7Q6B9Cqw"},
+            {"title": "Talk Saxy", "youtube_link": "https://www.youtube.com/watch?v=LdYJ6WqJ9qE"}
+        ]
+    },
+    "BOYNEXTDOOR (보이넥스트도어)": {
+        "멤버": ["성호", "리우", "재현", "태산", "이한", "운학"],
+        "설명": "KOZ엔터테인먼트 소속의 6인조 보이그룹. 옆집 소년들처럼 친근하고 유쾌한 매력으로 대중에게 다가가고 있어요!",
+        "사진_링크": "https://i.namu.wiki/i/n5D-G3iN4eW1h3Y2d6N9f6G4d4f2G8P5e0e0N8G4b7d5G4a2v9-U_FfU7G_e4L5s2U-9f6B9A3u0v6jF4z2v3S5z5l5P1q1C1g1j1z1h1x1c1e2h2v4l5R9P5B4K6H4F7O4K5J2e.webp",
+        "인기곡": [
+            {"title": "One and Only", "youtube_link": "https://www.youtube.com/watch?v=MInE7d7J0bU"},
+            {"title": "Serenade", "youtube_link": "https://www.youtube.com/watch?v=O15-M803GjQ"},
+            {"title": "But Sometime", "youtube_link": "https://www.youtube.com/watch?v=N4tLwK4hNgs"}
+        ]
+    },
+    "NCT WISH (엔시티 위시)": {
+        "멤버": ["시온", "리쿠", "유우시", "재희", "료", "사쿠야"],
+        "설명": "SM엔터테인먼트 소속의 6인조 보이그룹. 'WISH for OUR WISH'라는 캐치프레이즈로, 음악과 퍼포먼스를 통해 모든 사람들의 '소원'과 '꿈'을 응원하고 있어요!",
+        "사진_링크": "https://news.mtn.co.kr/news_content/image_html_dir/2024/02/2024022810052358897_1.jpg",
+        "인기곡": [
+            {"title": "WISH", "youtube_link": "https://www.youtube.com/watch?v=3-E08n8Nq5c"},
+            {"title": "Hands Up", "youtube_link": "https://www.youtube.com/watch?v=P_3yW7mQ3vE"},
+            {"title": "Stars Align", "youtube_link": "https://www.youtube.com/watch?v=84VwJbB34y0"}
+        ]
+    },
+    "투모로우바이투게더 (TXT)": {
+        "멤버": ["수빈", "연준", "범규", "태현", "휴닝카이"],
+        "설명": "빅히트 뮤직 소속의 5인조 보이그룹. 밝고 청량한 매력으로 '성장'과 '청춘'의 서사를 노래하며 많은 사랑을 받고 있어요!",
+        "사진_링크": "https://image.ytn.co.kr/image/general/2024/03/2908581024_t_v2.jpg",
+        "인기곡": [
+            {"title": "Sugar Rush Ride", "youtube_link": "https://www.youtube.com/watch?v=MADXyqR0cQ4"},
+            {"title": "Good Boy Gone Bad", "youtube_link": "https://www.youtube.com/watch?v=y_HwJ718pYw"},
+            {"title": "Run Away", "youtube_link": "https://www.youtube.com/watch?v=X5MFlG-g3U8"}
+        ]
+    },
+    "TWS (투어스)": {
+        "멤버": ["신유", "도훈", "영재", "한진", "지훈", "경민"],
+        "설명": "플레디스 엔터테인먼트 소속의 6인조 보이그룹. 보이 넥스트 도어의 동생 그룹이자 세븐틴 동생 그룹으로 2024년 데뷔했어요. 밝고 긍정적인 '보이후드 팝' 장르를 표방해요!",
+        "사진_링크": "https://img.osen.co.kr/article/2024/03/14/202403140924773809_650x.jpg",
+        "인기곡": [
+            {"title": "첫 만남은 계획대로 되지 않아", "youtube_link": "https://www.youtube.com/watch?v=mE9pQvI-iT0"},
+            {"title": "BFF", "youtube_link": "https://www.youtube.com/watch?v=p79q6cM28gE"},
+            {"title": "unplugged boy", "youtube_link": "https://www.youtube.com/watch?v=0kI4_7_yP-8"}
+        ]
+    },
+    "EXO (엑소)": {
+        "멤버": ["수호", "시우민", "백현", "첸", "찬열", "디오", "카이", "세훈"],
+        "설명": "SM엔터테인먼트 소속의 보이그룹. '으르렁', 'CALL ME BABY' 등으로 큰 인기를 얻으며 K-POP의 황금기를 이끈 대표적인 그룹이에요!",
+        "사진_링크": "https://file.osen.co.kr/article/2023/07/11/202307111059775269_650x.jpg",
+        "인기곡": [
+            {"title": "으르렁 (Growl)", "youtube_link": "https://www.youtube.com/watch?v=I3dezFzsNig"},
+            {"title": "CALL ME BABY", "youtube_link": "https://www.youtube.com/watch?v=yWfsla_Um80"},
+            {"title": "Love Shot", "youtube_link": "https://www.youtube.com/watch?v=pX_S4L5wS0g"}
+        ]
+    },
+    "NCT 127": {
+        "멤버": ["태일", "쟈니", "태용", "유타", "도영", "재현", "정우", "마크", "해찬"],
+        "설명": "SM엔터테인먼트 소속의 보이그룹 NCT의 유닛. 서울(127)을 기반으로 활동하며 'Neo Culture Technology'의 정체성을 보여주는 독특한 음악과 퍼포먼스를 선보여요!",
+        "사진_링크": "https://file.osen.co.kr/article/2022/09/20/202209200827774780_650x.jpg",
+        "인기곡": [
+            {"title": "영웅 (英雄; Kick It)", "youtube_link": "https://www.youtube.com/watch?v=ZfXnL5S8VnU"},
+            {"title": "2 Baddies", "youtube_link": "https://www.youtube.com/watch?v=w6J9d-WbFgc"},
+            {"title": "Cherry Bomb", "youtube_link": "https://www.youtube.com/watch?v=W_rfP8K5N3c"}
+        ]
+    },
+    "NCT DREAM": {
+        "멤버": ["마크", "런쥔", "제노", "해찬", "재민", "천러", "지성"],
+        "설명": "SM엔터테인먼트 소속의 보이그룹 NCT의 유닛. 청소년 연합팀으로 시작하여 활발한 활동을 펼치며 밝고 희망찬 에너지를 전달해요!",
+        "사진_링크": "https://cdn.asiatoday.co.kr/images/target.jpg?20231201103233",
+        "인기곡": [
+            {"title": "Candy", "youtube_link": "https://www.youtube.com/watch?v=qCj-mKjKx8I"},
+            {"title": "Hot Sauce", "youtube_link": "https://www.youtube.com/watch?v=oT5N08J568g"},
+            {"title": "GO", "youtube_link": "https://www.youtube.com/watch?v=0I6HP1QnN0E"}
+        ]
+    },
+    
     # --- 여자 아이돌 ---
-    "장원영": {
-        "그룹": "IVE (아이브)",
-        "사진_링크": "https://img.sbs.co.kr/newsite/editor/202305/0177727181f211516e864c8f00032a39.jpg",
-        "추천_노래": [
-            {"title": "IVE - I AM", "youtube_link": "https://www.youtube.com/watch?v=6ZUIwj3FgEQ"},
-            {"title": "IVE - LOVE DIVE", "youtube_link": "https://www.youtube.com/watch?v=Y8JFxS1HlDo"},
-            {"title": "IVE - ELEVEN", "youtube_link": "https://www.youtube.com/watch?v=F0B7HDiY-1E"},
-            {"title": "IVE - After LIKE", "youtube_link": "https://www.youtube.com/watch?v=bVf9WzV-c_A"}
-        ],
-        "별명": ["워뇨", "녕", "장만월"]
+    "IVE (아이브)": {
+        "멤버": ["안유진", "가을", "레이", "장원영", "리즈", "이서"],
+        "설명": "스타쉽엔터테인먼트 소속의 6인조 다국적 걸그룹. 'I HAVE', 'ELEVEN', 'LOVE DIVE' 등 매번 신선하고 중독성 있는 음악으로 큰 사랑을 받고 있어요!",
+        "사진_링크": "https://image.ytn.co.kr/image/general/2024/05/2710313176_t_v2.jpg",
+        "인기곡": [
+            {"title": "I AM", "youtube_link": "https://www.youtube.com/watch?v=6ZUIwj3FgEQ"},
+            {"title": "LOVE DIVE", "youtube_link": "https://www.youtube.com/watch?v=Y8JFxS1HlDo"},
+            {"title": "ELEVEN", "youtube_link": "https://www.youtube.com/watch?v=F0B7HDiY-1E"}
+        ]
     },
-    "지수": {
-        "그룹": "BLACKPINK (블랙핑크)",
-        "사진_링크": "https://pds.joongang.co.kr/news/component/202303/31/35990264-92ef-4573-8991-b3b4f622f954.jpg",
-        "추천_노래": [
-            {"title": "BLACKPINK - DDU-DU DDU-DU", "youtube_link": "https://www.youtube.com/watch?v=IHNzOHi8sJs"},
-            {"title": "BLACKPINK - Kill This Love", "youtube_link": "https://www.youtube.com/watch?v=2S24-y03-xE"},
-            {"title": "BLACKPINK - Pink Venom", "youtube_link": "https://www.youtube.com/watch?v=gT8_M-h-93U"},
-            {"title": "JISOO - FLOWER", "youtube_link": "https://www.youtube.com/watch?v=Yf1eS5n1iQ4"}
-        ],
-        "별명": ["지츄", "치츄"]
+    "BLACKPINK (블랙핑크)": {
+        "멤버": ["지수", "제니", "로제", "리사"],
+        "설명": "YG엔터테인먼트 소속의 4인조 걸그룹. 'DDU-DU DDU-DU', 'Kill This Love' 등 수많은 히트곡을 발표하며 세계적인 영향력을 가진 그룹으로 성장했어요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Blackpink_2020.png/1280px-Blackpink_2020.png",
+        "인기곡": [
+            {"title": "DDU-DU DDU-DU", "youtube_link": "https://www.youtube.com/watch?v=IHNzOHi8sJs"},
+            {"title": "Kill This Love", "youtube_link": "https://www.youtube.com/watch?v=2S24-y03-xE"},
+            {"title": "Pink Venom", "youtube_link": "https://www.youtube.com/watch?v=gT8_M-h-93U"}
+        ]
     },
-    "민지": {
-        "그룹": "NewJeans (뉴진스)",
-        "사진_링크": "https://res.heraldm.com/content/image/2022/10/21/20221021000676_0.jpg",
-        "추천_노래": [
-            {"title": "NewJeans - Hype Boy", "youtube_link": "https://www.youtube.com/watch?v=TJs4eN21mJs"},
-            {"title": "NewJeans - Ditto", "youtube_link": "https://www.youtube.com/watch?v=pSG01C1R-C4"},
-            {"title": "NewJeans - Attention", "youtube_link": "https://www.youtube.com/watch?v=FGzBwV4Xw7o"},
-            {"title": "NewJeans - OMG", "youtube_link": "https://www.youtube.com/watch?v=sVMMvJ1BqfQ"}
-        ],
-        "별명": ["밍", "모찌"]
+    "VIVIZ (비비지)": {
+        "멤버": ["은하", "신비", "엄지"],
+        "설명": "빅플래닛메이드엔터 소속의 3인조 걸그룹. 전 여자친구 멤버들로 구성되어 화려하게 재데뷔했으며, 다양한 콘셉트를 소화하며 팬들의 사랑을 받고 있어요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Viviz_%28Big_Planet_Made_Entertainment%29_at_The_Show_on_October_19%2C_2021.jpg/1280px-Viviz_%28Big_Planet_Made_Entertainment%29_at_The_Show_on_October_19%2C_2021.jpg",
+        "인기곡": [
+            {"title": "BOP BOP!", "youtube_link": "https://www.youtube.com/watch?v=wX-y0M-YqW8"},
+            {"title": "LOVEADE", "youtube_link": "https://www.youtube.com/watch?v=S0T0eG_dFk0"},
+            {"title": "MANIAC", "youtube_link": "https://www.youtube.com/watch?v=1F_nQ-DqUss"}
+        ]
     },
-    "카리나": {
-        "그룹": "aespa (에스파)",
+    "aespa (에스파)": {
+        "멤버": ["카리나", "지젤", "윈터", "닝닝"],
+        "설명": "SM엔터테인먼트 소속의 4인조 걸그룹. '자신의 또 다른 자아인 아바타(ae)를 만나 새로운 세계를 경험한다'는 독특한 세계관과 음악으로 주목받고 있어요!",
         "사진_링크": "https://image.ytn.co.kr/image/general/2024/05/2717321048_t_v2.jpg",
-        "추천_노래": [
-            {"title": "aespa - Next Level", "youtube_link": "https://www.youtube.com/watch?v=4TWR90KJl84"},
-            {"title": "aespa - Drama", "youtube_link": "https://www.youtube.com/watch?v=KUv4A8c6i_M"},
-            {"title": "aespa - Spicy", "youtube_link": "https://www.youtube.com/watch?v=WODg2XfG2G4"}
-        ],
-        "별명": ["유지민", "리나"]
+        "인기곡": [
+            {"title": "Next Level", "youtube_link": "https://www.youtube.com/watch?v=4TWR90KJl84"},
+            {"title": "Drama", "youtube_link": "https://www.youtube.com/watch?v=KUv4A8c6i_M"},
+            {"title": "Spicy", "youtube_link": "https://www.youtube.com/watch?v=WODg2XfG2G4"}
+        ]
     },
-    # --- 남자 아이돌 ---
-    "뷔": {
-        "그룹": "BTS (방탄소년단)",
-        "사진_링크": "https://img.sbs.co.kr/newsite/editor/202309/02700018809e5306691c2c2f00021c17.jpg",
-        "추천_노래": [
-            {"title": "BTS - Dynamite", "youtube_link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
-            {"title": "BTS - Butter", "youtube_link": "https://www.youtube.com/watch?v=WMweEpGlu_U"},
-            {"title": "V - Love Me Again", "youtube_link": "https://www.youtube.com/watch?v=RboFk9_e7bQ"},
-            {"title": "V - Slow Dancing", "youtube_link": "https://www.youtube.com/watch?v=e_RjY0dJ27w"}
-        ],
-        "별명": ["태형", "김태형", "V"]
+    "BABYMONSTER (베이비몬스터)": {
+        "멤버": ["루카", "파리타", "아사", "아현", "라미", "로라", "치키타"],
+        "설명": "YG엔터테인먼트 소속의 7인조 다국적 걸그룹. 'Monster'라는 이름처럼 독보적인 재능과 매력을 겸비한 YG의 신인 걸그룹이에요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/BABYMONSTER_231124.jpg/1280px-BABYMONSTER_231124.jpg",
+        "인기곡": [
+            {"title": "SHEESH", "youtube_link": "https://www.youtube.com/watch?v=sI0C1RjD150"},
+            {"title": "BATTER UP", "youtube_link": "https://www.youtube.com/watch?v=WJDNjJ47I_I"},
+            {"title": "Stuck In The Middle", "youtube_link": "https://www.youtube.com/watch?v=IeZpI4p_0W8"}
+        ]
     },
-    "정국": {
-        "그룹": "BTS (방탄소년단)",
-        "사진_링크": "https://cdn.biz.heraldcorp.com/php/news/photo/202310/7289569_1_o.jpg",
-        "추천_노래": [
-            {"title": "BTS - Seven (feat. Latto)", "youtube_link": "https://www.youtube.com/watch?v=QU9c005-bog"},
-            {"title": "BTS - Standing Next to You", "youtube_link": "https://www.youtube.com/watch?v=F0B7HDiY-1E"}, # Place Holder
-            {"title": "BTS - Euphoria", "youtube_link": "https://www.youtube.com/watch?v=kX0vO4vlFg4"}
-        ],
-        "별명": ["전정국", "JK"]
+    "NMIXX (엔믹스)": {
+        "멤버": ["릴리", "해원", "설윤", "배이", "지우", "규진"],
+        "설명": "JYP엔터테인먼트 소속의 6인조 걸그룹. 'MIXX POP'이라는 독자적인 음악 장르를 개척하며 기존 K-POP에서 볼 수 없었던 새로운 시도를 선보여요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/NMIXX_at_Seoul_Music_Awards_2023.jpg/1280px-NMIXX_at_Seoul_Music_Awards_2023.jpg",
+        "인기곡": [
+            {"title": "DICE", "youtube_link": "https://www.youtube.com/watch?v=p1gwD_B1QvU"},
+            {"title": "O.O", "youtube_link": "https://www.youtube.com/watch?v=3WS_f20W2pM"},
+            {"title": "Love Me Like This", "youtube_link": "https://www.youtube.com/watch?v=p4gC2_l_xK4"}
+        ]
     },
-    "민규": {
-        "그룹": "SEVENTEEN (세븐틴)",
-        "사진_링크": "https://pds.joongang.co.kr/news/component/202307/11/4893737b-df78-430c-ab23-1d227575253e.jpg",
-        "추천_노래": [
-            {"title": "SEVENTEEN - Super", "youtube_link": "https://www.youtube.com/watch?v=e7k8-j62qXo"},
-            {"title": "SEVENTEEN - God of Music", "youtube_link": "https://www.youtube.com/watch?v=a3Lh-g9qL2Y"},
-            {"title": "SEVENTEEN - F*ck My Life", "youtube_link": "https://www.youtube.com/watch?v=vVj_sXn70R8"}
-        ],
-        "별명": ["밍", "밍구", "김민규"]
+    "TWICE (트와이스)": {
+        "멤버": ["나연", "정연", "모모", "사나", "지효", "미나", "다현", "채영", "쯔위"],
+        "설명": "JYP엔터테인먼트 소속의 9인조 다국적 걸그룹. 'CHEER UP', 'TT' 등 수많은 히트곡으로 국민 걸그룹으로 자리매김하며 활발하게 활동하고 있어요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Twice_in_2023.png/1280px-Twice_in_2023.png",
+        "인기곡": [
+            {"title": "CHEER UP", "youtube_link": "https://www.youtube.com/watch?v=c7rCyll5AeY"},
+            {"title": "TT", "youtube_link": "https://www.youtube.com/watch?v=ePpPVE-GGJw"},
+            {"title": "Feel Special", "youtube_link": "https://www.youtube.com/watch?v=3ymwXLvyuBY"}
+        ]
     },
-    "재현 (보이넥스트도어)": {
-        "그룹": "BOYNEXTDOOR (보이넥스트도어)",
-        "사진_링크": "https://www.wkorea.com/wp-content/uploads/2023/07/wkorea-118833959b8b0e7c541589a74c15fffc-850x1275.jpg",
-        "추천_노래": [
-            {"title": "BOYNEXTDOOR - One and Only", "youtube_link": "https://www.youtube.com/watch?v=MInE7d7J0bU"},
-            {"title": "BOYNEXTDOOR - Serenade", "youtube_link": "https://www.youtube.com/watch?v=O15-M803GjQ"},
-            {"title": "BOYNEXTDOOR - But Sometime", "youtube_link": "https://www.youtube.com/watch?v=N4tLwK4hNgs"}
-        ],
-        "별명": ["이재현", "보넥도 재현"]
+    "Billlie (빌리)": {
+        "멤버": ["시윤", "츠키", "문수아", "하람", "수현", "하루나", "시온"],
+        "설명": "미스틱스토리 소속의 7인조 걸그룹. 독특하고 신비로운 세계관과 음악으로 팬들에게 깊은 인상을 남기고 있어요!",
+        "사진_링크": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Billlie_at_Billlie%27s_Christmas_2022_Event_in_Yeongdeungpo_Times_Square_02.jpg/1280px-Billlie_at_Billlie%27s_Christmas_2022_Event_in_Yeongdeungpo_Times_Square_02.jpg",
+        "인기곡": [
+            {"title": "RING X RING", "youtube_link": "https://www.youtube.com/watch?v=UqQY9sM_zRk"},
+            {"title": "EUNOIA", "youtube_link": "https://www.youtube.com/watch?v=Jm0qJv9wS5k"},
+            {"title": "DANG! (hocus pocus)", "youtube_link": "https://www.youtube.com/watch?v=3g51R1t6c0U"}
+        ]
     },
-    "시온": {
-        "그룹": "NCT WISH (엔시티 위시)",
-        "사진_링크": "https://thumb.mt.co.kr/06/2024/02/2024022810052358897_1.jpg",
-        "추천_노래": [
-            {"title": "NCT WISH - WISH", "youtube_link": "https://www.youtube.com/watch?v=3-E08n8Nq5c"},
-            {"title": "NCT WISH - Hands Up", "youtube_link": "https://www.youtube.com/watch?v=3-E08n8Nq5c"}, # Place Holder
-            {"title": "NCT WISH - Stars Align", "youtube_link": "https://www.youtube.com/watch?v=3-E08n8Nq5c"} # Place Holder
-        ],
-        "별명": ["이시온", "엔시티위시 시온"]
-    },
-    "원빈": {
-        "그룹": "RIIZE (라이즈)",
-        "사진_링크": "https://file.osen.co.kr/article/2023/08/21/202308210925776264_650x.jpg",
-        "추천_노래": [
-            {"title": "RIIZE - Get A Guitar", "youtube_link": "https://www.youtube.com/watch?v=f2pf1_rNvnQ"},
-            {"title": "RIIZE - Love 119", "youtube_link": "https://www.youtube.com/watch?v=NfS7Q6B9Cqw"},
-            {"title": "RIIZE - Talk Saxy", "youtube_link": "https://www.youtube.com/watch?v=LdYJ6WqJ9qE"}
-        ],
-        "별명": ["박원빈", "라이즈 원빈"]
-    },
-    # 여기에 더 많은 아이돌을 직접 추가할 수 있어! (추천 노래에 'youtube_link' 추가하는 거 잊지 마!)
 }
 
-# --- 가상의 온라인 검색 시뮬레이션 함수 (실제로는 웹 스크래핑/API 연동 필요!) ---
-def search_idol_info_online(query):
-    # 미리 정해진 데이터베이스에 있는지 먼저 확인
-    for name, data in idol_database.items():
-        if query.lower() == name.lower() or query.lower() in [n.lower() for n in data["별명"]] or \
-           query.lower() in data["그룹"].lower():
-            return {
-                "name": name,
-                "group": data["그룹"],
-                "photo_link": data["사진_링크"],
-                "songs": data["추천_노래"], # 데이터베이스의 노래 목록 그대로 사용
-                "found_type": "데이터베이스에서 찾음"
-            }
+# --- 그룹 선택 필드 ---
+st.header("🎵 어떤 그룹이 궁금해?")
 
-    # 데이터베이스에 없다면, 가상의 '온라인 검색' 결과 시뮬레이션
-    random_titles = [
-        f"{query} - Best Song",
-        f"{query} - Catchy Tune",
-        f"{query} - Debut Track"
-    ]
+# group_database의 키(그룹 이름)들을 선택지 리스트로 만들어!
+group_names = list(group_database.keys())
+# 사용자가 선택할 그룹 이름
+selected_group_name = st.selectbox("아래 목록에서 궁금한 아이돌 그룹을 선택해줘!", group_names)
+
+# --- 선택된 그룹 정보 표시 ---
+if selected_group_name:
+    group_info = group_database[selected_group_name]
     
-    # 가상의 뮤비 링크 생성 (유튜브 검색 링크로 연결)
-    random_songs_with_links = [
-        {"title": title, "youtube_link": f"https://www.youtube.com/results?search_query={title.replace(' ', '+')}"}
-        for title in random.sample(random_titles, min(len(random_titles), 3))
-    ]
+    st.write("---") # 구분선
+    st.subheader(f"✨ {selected_group_name} 정보! ✨")
     
-    random_photo = "https://via.placeholder.com/300?text=아이돌+이미지" # 일반 이미지 플레이스홀더
+    # 그룹 사진 표시
+    if group_info["사진_링크"]:
+        st.image(group_info["사진_링크"], caption=f"{selected_group_name} 그룹 사진", width=400)
     
-    # query로 그룹명 추정 (정교한 로직은 아님)
-    detected_group = "알 수 없는 그룹"
-    if "블랙핑크" in query.lower(): detected_group = "BLACKPINK (블랙핑크)"
-    elif "뉴진스" in query.lower(): detected_group = "NewJeans (뉴진스)"
-    # ... (더 많은 그룹 조건 추가 가능)
+    # 멤버 정보
+    st.markdown(f"**멤버:** {', '.join(group_info['멤버'])}")
     
-    return {
-        "name": query.capitalize(),
-        "group": detected_group,
-        "photo_link": random_photo,
-        "songs": random_songs_with_links,
-        "found_type": "가상 온라인 검색 (실제 AI/데이터 연동 필요)"
-    }
-
-
-# --- 입력 필드 ---
-st.header("🔍 아이돌 찾기")
-idol_input_type = st.radio("어떤 방법으로 아이돌을 찾아볼까?", ("이름 입력", "사진 업로드"))
-
-identified_idol_info = None # 분석된 아이돌 정보를 저장할 변수
-
-if idol_input_type == "이름 입력":
-    idol_name_query = st.text_input("좋아하는 아이돌의 이름, 별명, 그룹명을 입력해줘!", placeholder="예: 장원영, 지수, 뷔, 라이즈... 누구든 입력해봐!")
+    # 그룹 설명
+    st.markdown(f"**그룹 설명:** {group_info['설명']}")
     
-    if st.button("이름으로 아이돌 찾기!"):
-        if idol_name_query:
-            with st.spinner(f"'{idol_name_query}' 정보 검색 중... 지구 반대편까지 검색하는 중! 🚀"):
-                # 검색 시뮬레이션 대기 시간
-                time.sleep(1.5) 
-                identified_idol_info = search_idol_info_online(idol_name_query)
-            
-            if identified_idol_info["found_type"] == "데이터베이스에서 찾음":
-                st.success(f"💖 데이터베이스에서 '{identified_idol_info['name']}'님을 찾았어! 💖")
-            else:
-                st.warning(f"✨ '{identified_idol_info['name']}'님 정보는 가상 온라인 검색을 통해 시뮬레이션 된 결과야! (실제 구현 시 웹 스크래핑/API 연동 필요) ✨")
-        else:
-            st.info("이름을 입력해야 내가 찾아줄 수 있어!")
-
-else: # 사진 업로드
-    uploaded_image = st.file_uploader("좋아하는 아이돌 사진을 여기에 업로드해줘!", type=["jpg", "jpeg", "png"])
+    st.write("---")
+    st.subheader("🎶 이 그룹의 인기곡 뮤직비디오를 감상해봐! 🎶")
     
-    if st.button("사진으로 아이돌 찾기! (AI 분석 - 예시)"):
-        if uploaded_image is not None:
-            st.image(uploaded_image, caption="업로드된 사진", use_column_width=True)
-            
-            # -------------------------------------------------------------------------------------------------
-            # 여기가 진짜 AI가 사진을 분석하는 부분이야!
-            # 현재는 파일 이름을 기반으로 한 시뮬레이션입니다.
-            # 실제 '어떤 아이돌이든' 사진으로 인식하려면 초고성능 얼굴 인식 딥러닝 모델이 필요합니다.
-            # -------------------------------------------------------------------------------------------------
-            
-            # 이미지 파일 이름을 분석해서 (매우 간단한 시뮬레이션!)
-            image_name = uploaded_image.name.lower() # 파일 이름을 소문자로 바꿔서 비교
-            
-            found_by_image_name = False
-            for name, data in idol_database.items():
-                # 아이돌 이름 또는 별명, 그룹명으로 파일명에 키워드 매칭
-                keywords = [name.lower()] + [n.lower() for n in data["별명"]] + [data["그룹"].lower()]
-                if any(keyword in image_name for keyword in keywords):
-                    identified_idol_info = {
-                        "name": name,
-                        "group": data["그룹"],
-                        "photo_link": data["사진_링크"],
-                        "songs": data["추천_노래"],
-                        "found_type": "사진 파일명 매칭"
-                    }
-                    found_by_image_name = True
-                    break
-
-            if not found_by_image_name:
-                st.warning("사진 분석 결과: 이 아이돌은 내 데이터베이스에도 없고, 파일 이름만으로는 누구인지 알 수가 없어요... ㅠㅠ (초고성능 AI 모델 학습 필요!)")
-                identified_idol_info = None # 찾지 못했음을 명확히 설정
-        else:
-            st.info("사진을 업로드해야 내가 분석해줄 수 있어!")
-
-# --- 분석 결과 및 노래 추천 ---
-st.write("---")
-st.header("✨ 분석 결과 및 노래 추천!")
-
-if identified_idol_info:
-    # 아이돌 사진 보여주기 (링크가 있으면)
-    if identified_idol_info["photo_link"] and "placeholder" not in identified_idol_info["photo_link"]:
-        st.success(f"💖 이 아이돌은 바로... {identified_idol_info['name']}님! (그룹: {identified_idol_info['group']}) 💖")
-    elif identified_idol_info["found_type"] == "가상 온라인 검색 (실제 AI/데이터 연동 필요)":
-        st.info(f"✨'{identified_idol_info['name']}'님 정보를 가상으로 찾았어요! (그룹: {identified_idol_info['group']}) ✨")
-    
-    if identified_idol_info["photo_link"]:
-        st.image(identified_idol_info["photo_link"], caption=f"{identified_idol_info['name']}님의 사진!", width=300)
-
-    st.subheader(f"🎶 {identified_idol_info['name']}님 (또는 {identified_idol_info['group']})의 추천 노래!")
-    for song in identified_idol_info['songs']:
+    # 인기곡 목록과 유튜브 링크 표시
+    for song in group_info['인기곡']:
         st.write(f"- **{song['title']}** [📺 뮤비 보러가기]({song['youtube_link']})")
-        # st.video()를 사용하면 유튜브 링크 자체를 바로 플레이할 수 있어! (대신 웹 링크 대신 직접 mp4 같은 파일 링크 필요)
-        # st.video(song['youtube_link']) # <-- 이 부분을 사용하고 싶으면, 실제 유튜브 영상 임베드 URL이 필요함!
-                                      #     현재는 직접 유튜브 페이지로 이동하도록 링크를 제공!
+        # st.video(song['youtube_link']) # <-- 이 부분을 사용하면 앱 내에 비디오가 직접 임베드돼!
+                                        #      대신 Streamlit Cloud에서는 외부 리소스 임베딩 제한이 있을 수 있고
+                                        #      일반적인 유튜브 링크 대신 직접적인 비디오 파일 URL (MP4 등)을 요구하기도 해.
+                                        #      그래서 일단은 링크를 클릭해서 새 창으로 열리게 하는 게 편할 거야!
 
-    st.info("더 궁금한 아이돌이 있다면 언제든 다시 검색해봐! 🥰")
-
-else: # identified_idol_info가 None일 경우
-    st.info("위에 아이돌의 이름이나 사진을 입력하고 검색 버튼을 눌러줘! 내가 열심히 찾아줄게! 🧐")
+    st.info("다른 그룹 정보도 언제든 선택해서 볼 수 있어! 🥰")
 
 # --- 앱 실행 방법 ---
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🏃‍♂️ 앱 실행 방법 (터미널에 입력!)")
 st.sidebar.code("streamlit run [이 파이썬 파일 이름].py")
-st.sidebar.write("예: `streamlit run ultimate_idol_app_with_mv.py`")
+st.sidebar.write("예: `streamlit run super_idol_group_app.py`")
