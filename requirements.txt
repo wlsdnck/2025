@@ -1,1 +1,2 @@
-pip install streamlit Pillow  # Pillow는 이미지 처리에 필요한 라이브러리야!
+streamlit
+Pillow
